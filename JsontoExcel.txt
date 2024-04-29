@@ -7,6 +7,8 @@ Sub ImportJSONFolderToExcel()
     Dim rowIndex As Integer
     Dim colIndex As Integer
     Dim fso As Object
+    Dim wb As Workbook
+    Dim savePath As String
     
     ' Create a FileSystemObject
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -23,36 +25,54 @@ Sub ImportJSONFolderToExcel()
         End If
     End With
     
-    ' Clear existing data in the active worksheet
-    ActiveSheet.Cells.Clear
+    ' Prompt the user to select a folder to save the Excel files
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .Title = "Select Folder to Save Excel Files"
+        .AllowMultiSelect = False
+        If .Show = -1 Then
+            savePath = .SelectedItems(1)
+        Else
+            MsgBox "No folder selected. Exiting macro.", vbExclamation
+            Exit Sub
+        End If
+    End With
     
     ' Get a list of all JSON files in the selected folder
     fileName = Dir(folderPath & "\*.json")
     
     ' Loop through each JSON file in the folder
     Do While fileName <> ""
+        ' Clear existing data in the active worksheet
+        ActiveSheet.Cells.Clear
+        
         ' Read the contents of the JSON file
         fileContent = fso.OpenTextFile(folderPath & "\" & fileName).ReadAll
         
         ' Parse the JSON content
         Set jsonData = JsonConverter.ParseJson(fileContent)
         
+        ' Create a new workbook
+        Set wb = Workbooks.Add
+        
         ' Loop through each JSON object and write data to Excel
-        rowIndex = ActiveSheet.Cells(Rows.Count, 1).End(xlUp).Row + 1 ' Find the next available row
+        rowIndex = 1
         For Each jsonObj In jsonData
             colIndex = 1
             For Each key In jsonObj.keys
-                Cells(rowIndex, colIndex).Value = key
-                Cells(rowIndex + 1, colIndex).Value = jsonObj(key)
+                wb.Sheets(1).Cells(rowIndex, colIndex).Value = key
+                wb.Sheets(1).Cells(rowIndex + 1, colIndex).Value = jsonObj(key)
                 colIndex = colIndex + 1
             Next key
             rowIndex = rowIndex + 2
         Next jsonObj
         
+        ' Save the workbook with the same name as the JSON file
+        wb.SaveAs savePath & "\" & Replace(fileName, ".json", ".xlsx")
+        wb.Close False ' Close the workbook without saving changes
+        
         ' Get the next JSON file in the folder
         fileName = Dir
     Loop
     
-    MsgBox "JSON files imported successfully!", vbInformation
+    MsgBox "JSON files imported and Excel files saved successfully!", vbInformation
 End Sub
-
