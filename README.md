@@ -1,8 +1,8 @@
 # ExcelHelpers
 Help in Excel usage and VBA
 
-jaon to excel
-
+json to excel
+##### code
 
 Sub ImportJSONFolderToExcel()
     Dim folderPath As String
