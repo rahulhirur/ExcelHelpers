@@ -24,3 +24,31 @@ def convert_json_files_to_excel(json_dir):
 # Example usage:
 json_directory = "/path/to/json/files"
 convert_json_files_to_excel(json_directory)
+
+
+
+
+import os
+import pandas as pd
+
+def concat_json_files_to_excel(json_dir, excel_file):
+    # Initialize an empty DataFrame to store concatenated data
+    combined_data = pd.DataFrame()
+
+    # Iterate through JSON files in the directory
+    for filename in os.listdir(json_dir):
+        if filename.endswith('.json'):
+            json_file = os.path.join(json_dir, filename)
+            # Read JSON data into a DataFrame
+            json_data = pd.read_json(json_file)
+            # Concatenate the data
+            combined_data = pd.concat([combined_data, json_data], ignore_index=True)
+
+    # Save concatenated data to Excel
+    combined_data.to_excel(excel_file, index=False)
+
+# Example usage:
+json_directory = "/path/to/json/files"
+excel_file = "combined_output.xlsx"
+concat_json_files_to_excel(json_directory, excel_file)
+
