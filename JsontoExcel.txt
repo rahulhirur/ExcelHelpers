@@ -1,27 +1,27 @@
 import json
-import xlwt
+from openpyxl import Workbook
 
 def json_to_excel(json_file, excel_file):
     with open(json_file, 'r') as file:
         json_data = json.load(file)
     
-    workbook = xlwt.Workbook()
-    sheet = workbook.add_sheet('Sheet1')
+    workbook = Workbook()
+    sheet = workbook.active
     
-    row = 0
+    # Write headers
+    headers = list(json_data[0].keys())
+    sheet.append(headers)
+    
+    # Write data
     for item in json_data:
-        col = 0
-        for key, value in item.items():
-            sheet.write(row, col, key)
-            sheet.write(row, col + 1, str(value))  # Convert non-string values to string
-            col += 2  # Move to the next column for the next key-value pair
-        row += 1  # Move to the next row for the next item in the JSON data
+        row_data = [str(value) for value in item.values()]
+        sheet.append(row_data)
     
     workbook.save(excel_file)
 
 # Provide the path to your JSON file and the desired output Excel file
 json_file = "input.json"
-excel_file = "output.xls"
+excel_file = "output.xlsx"
 
 # Convert JSON to Excel
 json_to_excel(json_file, excel_file)
