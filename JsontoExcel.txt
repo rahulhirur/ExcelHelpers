@@ -25,3 +25,20 @@ excel_file = "output.xlsx"
 
 # Convert JSON to Excel
 json_to_excel(json_file, excel_file)
+
+
+
+import pandas as pd
+
+def json_to_excel(json_file, excel_file):
+    # Load JSON data into a DataFrame
+    json_data = pd.read_json(json_file)
+    
+    # Save DataFrame to Excel
+    json_data.to_excel(excel_file, index=False)
+
+# Example usage:
+json_file = "input.json"
+excel_file = "output.xlsx"
+json_to_excel(json_file, excel_file)
+
