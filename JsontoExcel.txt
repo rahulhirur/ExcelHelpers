@@ -1,79 +1,27 @@
-Sub ImportJSONFolderToExcel()
-    Dim folderPath As String
-    Dim savePath As String
-    Dim fileName As String
-    Dim fileContent As String
-    Dim fso As Object
-    Dim jsonData As Object
-    Dim excelApp As Object
-    Dim excelWorkbook As Object
-    Dim excelWorksheet As Object
-    Dim rowIndex As Integer
-    Dim colIndex As Integer
+import json
+import xlwt
+
+def json_to_excel(json_file, excel_file):
+    with open(json_file, 'r') as file:
+        json_data = json.load(file)
     
-    ' Create a FileSystemObject
-    Set fso = CreateObject("Scripting.FileSystemObject")
+    workbook = xlwt.Workbook()
+    sheet = workbook.add_sheet('Sheet1')
     
-    ' Prompt the user to select a folder containing JSON files
-    With Application.FileDialog(msoFileDialogFolderPicker)
-        .Title = "Select Folder Containing JSON Files"
-        .AllowMultiSelect = False
-        If .Show = -1 Then
-            folderPath = .SelectedItems(1)
-        Else
-            MsgBox "No folder selected. Exiting macro.", vbExclamation
-            Exit Sub
-        End If
-    End With
+    row = 0
+    for item in json_data:
+        col = 0
+        for key, value in item.items():
+            sheet.write(row, col, key)
+            sheet.write(row, col + 1, str(value))  # Convert non-string values to string
+            col += 2  # Move to the next column for the next key-value pair
+        row += 1  # Move to the next row for the next item in the JSON data
     
-    ' Prompt the user to select a folder to save Excel files
-    With Application.FileDialog(msoFileDialogFolderPicker)
-        .Title = "Select Folder to Save Excel Files"
-        .AllowMultiSelect = False
-        If .Show = -1 Then
-            savePath = .SelectedItems(1)
-        Else
-            MsgBox "No folder selected. Exiting macro.", vbExclamation
-            Exit Sub
-        End If
-    End With
-    
-    ' Get a list of all JSON files in the selected folder
-    fileName = Dir(folderPath & "\*.json")
-    
-    ' Loop through each JSON file in the folder
-    Do While fileName <> ""
-        ' Read the contents of the JSON file
-        fileContent = fso.OpenTextFile(folderPath & "\" & fileName).ReadAll
-        
-        ' Display the contents of the JSON file
-        MsgBox fileContent, vbInformation, "Contents of " & fileName
-        
-        ' Parse the JSON content
-        Set jsonData = JsonConverter.ParseJson(fileContent)
-        
-        ' Create a new Excel application and workbook
-        Set excelApp = CreateObject("Excel.Application")
-        Set excelWorkbook = excelApp.Workbooks.Add
-        Set excelWorksheet = excelWorkbook.Sheets(1)
-        
-        ' Loop through each JSON object and write data to Excel
-        rowIndex = 1
-        For Each jsonObj In jsonData
-            colIndex = 1
-            For Each key In jsonObj.keys
-                excelWorksheet.Cells(rowIndex, colIndex).Value = key
-                excelWorksheet.Cells(rowIndex + 1, colIndex).Value = jsonObj(key)
-                colIndex = colIndex + 1
-            Next key
-            rowIndex = rowIndex + 2
-        Next jsonObj
-        
-        ' Save the Excel workbook
-        excelWorkbook.SaveAs savePath & "\" & Replace(fileName, ".json", ".xlsx")
-        
-        ' Close the workbook and quit Excel
-        excelWorkbook.Close False
-        excelApp.Quit
-        
-        ' Release object refe
+    workbook.save(excel_file)
+
+# Provide the path to your JSON file and the desired output Excel file
+json_file = "input.json"
+excel_file = "output.xls"
+
+# Convert JSON to Excel
+json_to_excel(json_file, excel_file)
