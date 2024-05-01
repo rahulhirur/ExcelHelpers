@@ -49,6 +49,7 @@ def convert_json_files_to_excel(json_dir):
             json_file = os.path.join(json_dir, filename)
             excel_file = json_file + '.xlsx'  # Change the extension to .xlsx
             json_to_excel(json_file, excel_file)
+            print(excel_file)
 
 # Example usage:
 json_directory = "/path/to/json/files"
